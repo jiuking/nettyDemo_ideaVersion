@@ -11,6 +11,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 /**
  * 丢弃任何进入的数据 启动服务端的DiscardServerHandler
+ * @author HJC
+ *
  */
 public class DiscardServer {
     private int port;
