@@ -24,16 +24,17 @@ public class MultiplexerTimeServer implements Runnable {
 
     private volatile boolean stop;
 
-    public MultiplexerTimeServer() {
-
-    }
-
     public MultiplexerTimeServer(int port) {
         try {
-            selector = Selector.open();
+
+            //打开ServerSocketChannel，监听客户端的连接，它是所有客户端连接的父管道
             serverSocketChannel = ServerSocketChannel.open();
+            //绑定监听端口，设置连接为非阻塞模式
             serverSocketChannel.configureBlocking(false);
             serverSocketChannel.socket().bind(new InetSocketAddress(port), 1024);
+            //创建Reactor线程，创建多路复用器
+            selector = Selector.open();
+            //将ServerSocketChannel注册到Reactor线程的多路复用器Selector上，监听Accept事件。
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
         } catch (IOException e) {
