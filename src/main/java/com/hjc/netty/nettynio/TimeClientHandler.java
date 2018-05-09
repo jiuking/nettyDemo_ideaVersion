@@ -17,12 +17,14 @@ public class TimeClientHandler extends ChannelInboundHandlerAdapter {
     private static Logger logger = LoggerFactory.getLogger(TimeClientHandler.class);
 
     private final ByteBuf firstMessage;
+    byte[] reqNew;
 
     public TimeClientHandler() {
         logger.info("asdf");
-        byte[] req = "QUERY TIME ORDER".getBytes();
+        byte[] req = ("QUERY TIME ORDER"+System.getProperty("line.separator")).getBytes();
         firstMessage = Unpooled.buffer(req.length);
         firstMessage.writeBytes(req);
+        reqNew = req;
     }
 
     @Override
@@ -36,7 +38,13 @@ public class TimeClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ctx.writeAndFlush(firstMessage);
+        ByteBuf msg = null;
+        for (int i = 0; i < 100; i++) {
+            msg = Unpooled.buffer(reqNew.length);
+            msg.writeBytes(reqNew);
+            ctx.writeAndFlush(msg);
+        }
+//        ctx.writeAndFlush(firstMessage);
     }
 
     @Override

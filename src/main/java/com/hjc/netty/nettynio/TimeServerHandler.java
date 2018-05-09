@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.EventExecutorGroup;
 
 import java.util.Date;
@@ -16,13 +17,16 @@ import java.util.Date;
  */
 public class TimeServerHandler extends ChannelInboundHandlerAdapter{
 
+    private int counter;
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);
-        String body = new String(bytes, "UTF-8");
-        System.out.println("The time server receive order:" + body);
+        String body = new String(bytes, "UTF-8").substring(0,bytes.length - System.getProperty("line.separator").length());
+//        String body = buf.toString(CharsetUtil.UTF_8);
+        System.out.println("The time server receive order:" + body+",the counter is:"+ ++counter);
         String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body) ? new Date().toString() : "BAD REQUEST";
         ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
         ctx.write(resp);
