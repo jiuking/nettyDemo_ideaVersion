@@ -17,5 +17,7 @@ public class Test {
         System.out.println(1|0);
         System.out.println("msg".hashCode());
         System.out.println("result".hashCode());
+
+        System.out.println((int)1.5);
     }
 }
