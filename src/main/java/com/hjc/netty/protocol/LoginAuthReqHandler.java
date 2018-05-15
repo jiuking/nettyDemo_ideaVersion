@@ -22,10 +22,11 @@ public class LoginAuthReqHandler extends ChannelInboundHandlerAdapter{
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         NettyMessage message = (NettyMessage) msg;
         //如果是握手应答消息，需要判断是否认证成功
-        if (message.getHeader() != null && message.getHeader().getType() == Message.LOGIN_RESP.value()) {
+        if (message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_RESP.value()) {
             byte loginResult = (byte) message.getBody();
             if (loginResult != 0) {
                 //握手失败，关闭连接
+                System.out.println("关闭连接");
                 ctx.close();
             } else {
                 System.out.println("Login is ok:" + message);
@@ -40,7 +41,7 @@ public class LoginAuthReqHandler extends ChannelInboundHandlerAdapter{
     private NettyMessage buildLoginReq() {
         NettyMessage message = new NettyMessage();
         Header header = new Header();
-        header.setType(Message.LOGIN_REQ.value());
+        header.setType(MessageType.LOGIN_REQ.value());
         message.setHeader(header);
         return message;
     }

@@ -2,7 +2,7 @@ package com.hjc.netty.test;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hjc.netty.protocol.Header;
-import com.hjc.netty.protocol.Message;
+import com.hjc.netty.protocol.MessageType;
 import com.hjc.netty.protocol.NettyMessage;
 
 import java.util.HashMap;
@@ -27,6 +27,6 @@ public class JSONTest {
         header.setType((byte) 2);
         msg.setHeader(header);
         System.out.println(JSONObject.toJSONString(msg));
-        System.out.println(Message.LOGIN_RESP.value());
+        System.out.println(MessageType.LOGIN_RESP.value());
     }
 }

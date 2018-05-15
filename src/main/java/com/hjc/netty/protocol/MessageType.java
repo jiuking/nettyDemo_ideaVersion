@@ -6,7 +6,7 @@ package com.hjc.netty.protocol;
  */
 public enum MessageType {
 
-    LOGIN_REQ((byte)1),LOGIN_RESP((byte) 2);
+    LOGIN_REQ((byte) 0), LOGIN_RESP((byte) 1), HEARTBEAT_REQ((byte) 5), HEARTBEAT_RESP((byte) 6);
 
     private byte value;
 

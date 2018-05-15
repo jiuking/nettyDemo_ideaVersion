@@ -8,10 +8,9 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.util.CharsetUtil;
 
 import java.util.List;
-import java.util.Map;
 
 /**
- * @author : Administrator
+ * @author : Hjc
  * @date : 2018/5/14 0014 11:16
  * @description : Netty消息编码类
  */

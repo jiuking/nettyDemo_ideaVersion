@@ -30,6 +30,7 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
             }else {
                 InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
                 String ip = address.getAddress().getHostAddress();
+                System.out.println("請求的IP地址是"+ip);
                 boolean isOk = false;
                 for (String white : whiteList) {
                     if (white.equals(ip)) {
