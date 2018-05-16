@@ -1,6 +1,8 @@
 package com.hjc.netty.protocol;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -8,6 +10,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import java.net.InetSocketAddress;
@@ -32,15 +36,20 @@ public class NettyClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4));
-                            socketChannel.pipeline().addLast("MessageEncoder", new NettyMessageEncoder());
-                            socketChannel.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
+//                            socketChannel.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4));
+//                            socketChannel.pipeline().addLast("MessageEncoder", new NettyMessageEncoder());
+                            ByteBuf byteBuf = Unpooled.copiedBuffer("$_".getBytes());
+                            socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, byteBuf));
+                            socketChannel.pipeline().addLast(new StringDecoder());
+//                            socketChannel.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
                             socketChannel.pipeline().addLast("LoginAuthHandler", new LoginAuthReqHandler());
+                            socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, byteBuf));
+                            socketChannel.pipeline().addLast(new StringDecoder());
                             socketChannel.pipeline().addLast("HeartBeatHandle", new HeartBeatReqHandler());
                         }
                     });
             ChannelFuture future = b.connect(new InetSocketAddress(host, port),
-                    new InetSocketAddress("127.0.0.2", 8080)).sync();
+                    new InetSocketAddress("127.0.0.1", 12088)).sync();
 
             future.channel().closeFuture().sync();
         } finally {
@@ -50,7 +59,7 @@ public class NettyClient {
                     try {
                         TimeUnit.SECONDS.sleep(5);
                         try {
-                            connect("127.0.0.2", 8080);
+                            connect("127.0.0.1", 8080);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

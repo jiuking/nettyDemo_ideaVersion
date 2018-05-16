@@ -1,12 +1,16 @@
 package com.hjc.netty.protocol;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -32,10 +36,15 @@ public class NettyServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4));
-                        socketChannel.pipeline().addLast(new NettyMessageEncoder());
-                        socketChannel.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
+//                        socketChannel.pipeline().addLast(new NettyMessageDecoder(1024 * 1024, 4, 4));
+//                        socketChannel.pipeline().addLast(new NettyMessageEncoder());
+                        ByteBuf byteBuf = Unpooled.copiedBuffer("$_".getBytes());
+                        socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, byteBuf));
+                        socketChannel.pipeline().addLast(new StringDecoder());
+//                        socketChannel.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50));
                         socketChannel.pipeline().addLast(new LoginAuthRespHandler());
+                        socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, byteBuf));
+                        socketChannel.pipeline().addLast(new StringDecoder());
                         socketChannel.pipeline().addLast("HeartBeatHandler", new HearBeatRespHandler());
                     }
                 });

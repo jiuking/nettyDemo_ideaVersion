@@ -1,5 +1,8 @@
 package com.hjc.netty.protocol;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -20,7 +23,9 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        NettyMessage message = (NettyMessage) msg;
+        String msgStr = (String) msg;
+        NettyMessage message = JSON.parseObject(msgStr,NettyMessage.class);
+        msgStr += "$_";
         if (message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_REQ.value()) {
             String nodeIndex = ctx.channel().remoteAddress().toString();
             NettyMessage loginResp;
@@ -43,10 +48,10 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
                     nodeCheck.put(nodeIndex, true);
                 }
                 System.out.println("The login response is :" + loginResp + " body [" + loginResp.getBody() + "]");
-                ctx.writeAndFlush(loginResp);
+                ctx.writeAndFlush(Unpooled.copiedBuffer((JSONObject.toJSONString(loginResp) + "$_").getBytes()));
             }
         }else {
-            ctx.fireChannelRead(msg);
+            ctx.fireChannelRead(msgStr);
         }
     }
 

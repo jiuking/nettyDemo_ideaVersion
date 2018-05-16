@@ -1,5 +1,7 @@
 package com.hjc.netty.protocol;
 
+import com.alibaba.fastjson.JSON;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -12,14 +14,15 @@ public class HearBeatRespHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        NettyMessage message = (NettyMessage) msg;
+        String msgStr = (String) msg;
+        NettyMessage message = JSON.parseObject(msgStr,NettyMessage.class);
         if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_REQ.value()) {
             System.out.println("Receive client heart beat message : -->" + message);
             NettyMessage heartBeat = buildHeartBeat();
             System.out.println("Send heart beat response message to client : -->" + heartBeat);
-            ctx.writeAndFlush(heartBeat);
+            ctx.writeAndFlush(Unpooled.copiedBuffer((JSON.toJSONString(heartBeat)+"$_").getBytes()));
         }else {
-            ctx.fireChannelRead(msg);
+            ctx.fireChannelRead(Unpooled.copiedBuffer((msgStr+"$_").getBytes()));
         }
     }
 
